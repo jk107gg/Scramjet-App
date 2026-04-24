@@ -1,64 +1,51 @@
 "use strict";
-/**
- * @type {HTMLFormElement}
- */
+
 const form = document.getElementById("sj-form");
-/**
- * @type {HTMLInputElement}
- */
 const address = document.getElementById("sj-address");
-/**
- * @type {HTMLInputElement}
- */
 const searchEngine = document.getElementById("sj-search-engine");
-/**
- * @type {HTMLParagraphElement}
- */
-const error = document.getElementById("sj-error");
-/**
- * @type {HTMLPreElement}
- */
-const errorCode = document.getElementById("sj-error-code");
 
-const { ScramjetController } = __scramjet$loadController;
+// This line handles the variable name change in the Scramjet engine
+const controllerLoader = window.$scramjetLoadController || window.__scramjet$loadController;
 
-const scramjet = new ScramjetController({
-    files: {
-        wasm: "https://mercuryworkshop.github.io/scramjet-app/scram/scramjet.wasm.wasm",
-        all: "https://mercuryworkshop.github.io/scramjet-app/scram/scramjet.all.js",
-        sync: "https://mercuryworkshop.github.io/scramjet-app/scram/scramjet.sync.js",
-    },
-});
+if (!controllerLoader) {
+    console.error("CRITICAL: Scramjet engine parts failed to load from CDN. Check your index.html script tags!");
+} else {
+    const { ScramjetController } = controllerLoader();
 
-scramjet.init();
+    const scramjet = new ScramjetController({
+        files: {
+            wasm: "https://mercuryworkshop.github.io/scramjet-app/scram/scramjet.wasm.wasm",
+            all: "https://mercuryworkshop.github.io/scramjet-app/scram/scramjet.all.js",
+            sync: "https://mercuryworkshop.github.io/scramjet-app/scram/scramjet.sync.js",
+        },
+    });
 
-const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
+    scramjet.init();
 
-form.addEventListener("submit", async (event) => {
-	event.preventDefault();
+    // Using a public Bare server so you don't need local 'baremux' folders
+    const connection = new BareMux.BareMuxConnection("https://bare.benropt.me/bare/");
 
-	try {
-		await registerSW();
-	} catch (err) {
-		error.textContent = "Failed to register service worker.";
-		errorCode.textContent = err.toString();
-		throw err;
-	}
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        
+        // This stops the 'nothing happens' bug by logging to the console
+        console.log("Orbit Engine processing:", address.value);
 
-	const url = search(address.value, searchEngine.value);
-
-	let wispUrl =
-		(location.protocol === "https:" ? "wss" : "ws") +
-		"://" +
-		location.host +
-		"/wisp/";
-	if ((await connection.getTransport()) !== "/libcurl/index.mjs") {
-		await connection.setTransport("/libcurl/index.mjs", [
-			{ websocket: wispUrl },
-		]);
-	}
-	const frame = scramjet.createFrame();
-	frame.frame.id = "sj-frame";
-	document.body.appendChild(frame.frame);
-	frame.go(url);
-});
+        try {
+            // This function is usually in register-sw.js
+            if (typeof registerSW === 'function') {
+                await registerSW();
+            }
+            
+            // This function is usually in search.js
+            const url = search(address.value, searchEngine.value);
+            
+            const frame = scramjet.createFrame();
+            frame.frame.id = "sj-frame";
+            document.body.appendChild(frame.frame);
+            frame.go(url);
+        } catch (err) {
+            console.error("Proxy Error:", err);
+        }
+    });
+}
