@@ -23,10 +23,10 @@ const errorCode = document.getElementById("sj-error-code");
 const { ScramjetController } = __scramjet$loadController;
 
 const scramjet = new ScramjetController({
-	files: {
-		wasm: "/scram/scramjet.wasm.wasm",
-		all: "/scram/scramjet.all.js",
-		sync: "/scram/scramjet.sync.js",
+files: {
+		wasm: "https://mercuryworkshop.github.io/scramjet-app/scram/scramjet.wasm.wasm",
+		all: "https://mercuryworkshop.github.io/scramjet-app/scram/scramjet.all.js",
+		sync: "https://mercuryworkshop.github.io/scramjet-app/scram/scramjet.sync.js",
 	},
 });
 
