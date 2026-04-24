@@ -13,14 +13,14 @@ if (!controllerLoader) {
 } else {
     const { ScramjetController } = controllerLoader();
 
-    const scramjet = new ScramjetController({
-        files: {
-            wasm: "https://mercuryworkshop.github.io/scramjet-app/scram/scramjet.wasm.wasm",
-            all: "https://mercuryworkshop.github.io/scramjet-app/scram/scramjet.all.js",
-            sync: "https://mercuryworkshop.github.io/scramjet-app/scram/scramjet.sync.js",
-        },
-    });
-
+// Replace your ScramjetController block with this:
+const scramjet = new ScramjetController({
+    files: {
+        wasm: "https://cdn.jsdelivr.net/gh/MercuryWorkshop/scramjet-app@main/public/scram/scramjet.wasm.wasm",
+        all: "https://cdn.jsdelivr.net/gh/MercuryWorkshop/scramjet-app@main/public/scram/scramjet.all.js",
+        sync: "https://cdn.jsdelivr.net/gh/MercuryWorkshop/scramjet-app@main/public/scram/scramjet.sync.js",
+    },
+});
     scramjet.init();
 
     // Using a public Bare server so you don't need local 'baremux' folders
