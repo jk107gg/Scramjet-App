@@ -20,7 +20,7 @@ const error = document.getElementById("sj-error");
  */
 const errorCode = document.getElementById("sj-error-code");
 
-const { ScramjetController } = $scramjetLoadController();
+const { ScramjetController } = __scramjet$loadController;
 
 const scramjet = new ScramjetController({
 	files: {
